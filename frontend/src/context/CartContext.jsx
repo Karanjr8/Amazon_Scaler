@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import client from "../api/client";
 
 const CartContext = createContext(null);
-
-const API_BASE = "http://localhost:5000/api/cart";
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
@@ -12,10 +11,9 @@ export function CartProvider({ children }) {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await fetch(API_BASE, { credentials: "include" });
-        const data = await res.json();
-        if (data.success) {
-          setItems(data.cart || []);
+        const res = await client.get("/cart");
+        if (res.data?.success) {
+          setItems(res.data.cart || []);
         }
       } catch (err) {
         console.error("Failed to fetch cart:", err);
@@ -28,15 +26,9 @@ export function CartProvider({ children }) {
 
   const addToCart = async (product, quantity = 1) => {
     try {
-      const res = await fetch(`${API_BASE}/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, quantity }),
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
-        setItems(data.cart);
+      const res = await client.post("/cart/add", { productId: product.id, quantity });
+      if (res.data?.success) {
+        setItems(res.data.cart || []);
       }
     } catch (err) {
       console.error("Failed to add to cart:", err);
@@ -49,15 +41,9 @@ export function CartProvider({ children }) {
         await removeFromCart(productId);
         return;
       }
-      const res = await fetch(`${API_BASE}/update/${productId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity }),
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
-        setItems(data.cart);
+      const res = await client.post(`/cart/update/${productId}`, { quantity });
+      if (res.data?.success) {
+        setItems(res.data.cart || []);
       }
     } catch (err) {
       console.error("Failed to update cart quantity:", err);
@@ -66,13 +52,9 @@ export function CartProvider({ children }) {
 
   const removeFromCart = async (productId) => {
     try {
-      const res = await fetch(`${API_BASE}/remove/${productId}`, {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
-        setItems(data.cart);
+      const res = await client.post(`/cart/remove/${productId}`);
+      if (res.data?.success) {
+        setItems(res.data.cart || []);
       }
     } catch (err) {
       console.error("Failed to remove from cart:", err);
@@ -81,12 +63,8 @@ export function CartProvider({ children }) {
 
   const clearCart = async () => {
     try {
-      const res = await fetch(`${API_BASE}/clear`, {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.success) {
+      const res = await client.post("/cart/clear");
+      if (res.data?.success) {
         setItems([]);
       }
     } catch (err) {
