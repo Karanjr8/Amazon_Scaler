@@ -44,7 +44,9 @@ function ProductList() {
 
         const data = await fetchProducts(params);
         if (myId !== requestId) return;
-        setProducts(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data) ? data : [];
+        console.log("Fetched Products for List Component:", list);
+        setProducts(list);
       } catch (_err) {
         if (myId !== requestId) return;
         setError("Failed to load products. Is the API running at /api/products?");
@@ -95,7 +97,7 @@ function ProductList() {
     const filtered = products.filter((item) => matchesSearch(item, normalizedSearch));
 
     const groups = filtered.reduce((acc, item) => {
-      const categoryLabel = item.category || "Other";
+      const categoryLabel = item?.category || "Other";
       if (!acc[categoryLabel]) acc[categoryLabel] = [];
       acc[categoryLabel].push(item);
       return acc;
@@ -198,8 +200,7 @@ function ProductList() {
 
           {!loading && !error && products.length === 0 && (
             <p className="home-empty">
-              No products in the database yet. Add rows to <code>products</code> or run{" "}
-              <code>npm run seed:products</code>.
+              No products in the database yet. Add rows to <code>products</code>.
             </p>
           )}
 
@@ -208,7 +209,7 @@ function ProductList() {
               <div className="amz-grid-row">
                 {homeGroupedCategories.map((group) => (
                   <div key={group.categoryTitle} className="amz-card">
-                    <h2>Up to 60% off | {group.categoryTitle}</h2>
+                    <h2>Up to 60% off | {group?.categoryTitle || "Special Selection"}</h2>
                     <div className="amz-card-four-grid">
                       {group.items.map((product) => (
                         <Link
@@ -224,7 +225,7 @@ function ProductList() {
                             />
                           </div>
                           <span className="amz-four-grid-label">
-                            {getProductDisplayName(product)}
+                            {getProductDisplayName(product) || "Product"}
                           </span>
                         </Link>
                       ))}
@@ -253,7 +254,7 @@ function ProductList() {
                         alt={getProductDisplayName(product)}
                       />
                       <span className="amz-scroller-item-title">
-                        {getProductDisplayName(product)}
+                        {getProductDisplayName(product) || "Product"}
                       </span>
                       <span className="amz-scroller-item-price">
                         {formatInr(getProductPrice(product))}

@@ -38,8 +38,7 @@ function Cart() {
         </div>
 
         {items.map((item) => {
-          const pName = getProductDisplayName(item);
-          const pDesc = item.description || item.body || "";
+          const pName = item.name || "Product";
           
           return (
             <div key={item.id} className="cart-item-card">
@@ -53,17 +52,24 @@ function Cart() {
                 <Link to={`/products/${item.id}`} className="cart-item-title-link">
                   {pName}
                 </Link>
-                <div className="cart-item-desc">
-                  {pDesc}
-                </div>
-                <div className="cart-item-stock">In stock</div>
                 
-                <div className="cart-item-controls">
+                <div className="cart-item-price-row">
+                  <span className="cart-item-price">{formatInr(item.price)}</span>
+                </div>
+
+                <div className="cart-item-stock-status">
+                  {Number(item.stock ?? 0) > 0 ? (
+                    <span className="in-stock">In stock</span>
+                  ) : (
+                    <span className="out-of-stock">Out of stock</span>
+                  )}
+                </div>
+                
+                <div className="cart-item-actions">
                   <div className="qty-control">
                     <button 
                       className="qty-btn" 
                       onClick={() => handleQtyChange(item.id, item.quantity, -1)}
-                      aria-label="Decrease quantity"
                     >
                       −
                     </button>
@@ -71,23 +77,19 @@ function Cart() {
                     <button 
                       className="qty-btn" 
                       onClick={() => handleQtyChange(item.id, item.quantity, 1)}
-                      aria-label="Increase quantity"
+                      disabled={item.quantity >= Number(item.stock ?? 0)}
                     >
                       +
                     </button>
                   </div>
-                  <span className="control-separator" aria-hidden="true">|</span>
+                  <span className="separator">|</span>
                   <button 
                     className="remove-link" 
                     onClick={() => removeFromCart(item.id)}
                   >
-                    Delete
+                    Remove
                   </button>
                 </div>
-              </div>
-
-              <div className="cart-item-price-col">
-                <span className="cart-item-price">{formatInr(item.price)}</span>
               </div>
             </div>
           );

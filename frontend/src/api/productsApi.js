@@ -15,13 +15,11 @@ export const fetchProducts = async (params = {}) => {
   const list = Array.isArray(data.data) ? data.data : [];
 
   if (import.meta.env.DEV) {
-    console.debug("[API] GET /products", {
-      params,
-      count: list.length,
-      sample: list[0] ?? null,
-      imageUrlsSample: list.slice(0, 5).map((p) => ({ id: p?.id, image_url: p?.image_url })),
-    });
+    console.debug("[API] GET /products parameters", params);
   }
+  
+  // Step 6: Log explicit list for debugging
+  console.log("Fetched Products List:", list);
 
   return list;
 };
@@ -42,12 +40,24 @@ export const fetchProductById = async (id) => {
     });
   }
 
+  // Step 6: Log explicit detail for debugging
+  console.log("Fetched Product Detail:", product);
+
   return product;
 };
 
 export const createProduct = async (productData) => {
-  const { data } = await client.post("/products", productData);
-  return data.data;
+  console.log("[FRONTEND API] >> Dispatching POST /products with data:", JSON.stringify(productData, null, 2));
+  try {
+    const { data } = await client.post("/products", productData, {
+      headers: { "Content-Type": "application/json" }
+    });
+    console.log("[FRONTEND API] << Server Responded 201 Created:", data);
+    return data.data;
+  } catch (error) {
+    console.error("[FRONTEND API] << Server Error on POST /products:", error.response?.status, error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const fetchHeroImages = async (limit = 5) => {
@@ -62,9 +72,18 @@ export const fetchHeroImages = async (limit = 5) => {
 export const fetchProductReviews = async (productId) => {
   try {
     const { data } = await client.get(`/reviews/${productId}`);
-    return data.data || [];
+    return Array.isArray(data.data) ? data.data : [];
   } catch (error) {
-    // If backend doesn't support it, just swallow and return empty array
+    console.error("[API] GET /reviews Error:", error);
     return [];
   }
+};
+
+export const submitProductReview = async (productId, rating, comment) => {
+  const { data } = await client.post("/reviews", {
+    product_id: productId,
+    rating,
+    comment,
+  });
+  return data;
 };

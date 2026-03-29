@@ -3,8 +3,7 @@
  * No hardcoded catalog — only field mapping + placeholder image.
  */
 
-export const PRODUCT_IMAGE_PLACEHOLDER =
-  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80";
+export const PRODUCT_IMAGE_PLACEHOLDER = "/placeholder.png";
 
 export function parseImagesArray(images) {
   if (images == null || images === "") return [];
@@ -64,27 +63,8 @@ export function appendImageCacheBust(url, productId) {
 }
 
 export function getProductPrimaryImage(product) {
-  if (!product || typeof product !== "object") return PRODUCT_IMAGE_PLACEHOLDER;
-
-  const candidates = [
-    product.image_url,
-    product.imageUrl,
-    product.image,
-    product.img,
-    product.thumbnail_url,
-    product.primary_image,
-  ];
-
-  for (const c of candidates) {
-    if (c != null && String(c).trim()) {
-      return String(c).trim();
-    }
-  }
-
-  const fromGallery = parseImagesArray(product.images);
-  if (fromGallery.length > 0) return fromGallery[0];
-
-  return PRODUCT_IMAGE_PLACEHOLDER;
+  const image = product?.image || product?.image_url || PRODUCT_IMAGE_PLACEHOLDER;
+  return image;
 }
 
 export function getProductGalleryUrls(product) {
@@ -136,7 +116,10 @@ export function getProductPrice(product) {
 /** Rating from DB only (avg_rating / rating). Returns null if unknown. */
 export function getProductRatingFromDb(product) {
   if (!product || typeof product !== "object") return null;
-  const raw = product.avg_rating ?? product.rating ?? product.average_rating;
+  
+  const rate = product?.rating?.rate;
+  
+  const raw = product.avg_rating ?? rate ?? product.average_rating;
   if (raw == null || raw === "") return null;
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
@@ -145,7 +128,10 @@ export function getProductRatingFromDb(product) {
 
 export function getProductReviewCountFromDb(product) {
   if (!product || typeof product !== "object") return null;
-  const raw = product.review_count ?? product.reviews_count ?? product.num_reviews;
+  
+  const count = product?.rating?.count;
+  
+  const raw = product.review_count ?? count ?? product.reviews_count ?? product.num_reviews;
   if (raw == null || raw === "") return null;
   const n = Number(raw);
   if (!Number.isFinite(n) || n < 0) return null;

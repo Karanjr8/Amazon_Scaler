@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
@@ -13,10 +14,19 @@ import Wishlist from "./pages/Wishlist";
 import OrderSuccess from "./pages/OrderSuccess";
 
 function App() {
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(true);
+  const location = useLocation();
+  const isAuthRoute = location.pathname === "/login" || location.pathname === "/signup";
+
   return (
     <>
-      <Navbar />
-      <main className="container">
+      {!isAuthRoute && (
+        <Navbar 
+          desktopSidebarCollapsed={desktopSidebarCollapsed} 
+          setDesktopSidebarCollapsed={setDesktopSidebarCollapsed} 
+        />
+      )}
+      <main className={`main-content ${isAuthRoute ? 'auth-page-wrapper' : `container ${desktopSidebarCollapsed ? 'expanded' : ''}`}`}>
         <Routes>
           <Route path="/" element={<ProductList />} />
           <Route

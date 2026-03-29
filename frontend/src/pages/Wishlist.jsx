@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchWishlist, removeFromWishlist } from "../api/wishlistApi";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { formatInr } from "../utils/formatInr";
 import ProductImage from "../components/ProductImage";
@@ -9,28 +10,36 @@ import { getProductDisplayName } from "../utils/productFields";
 
 function Wishlist() {
   const { addToCart } = useCart();
+  const { isAuthenticated, logout } = useAuth();
   const { showToast } = useToast();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const loadWishlist = useCallback(async () => {
+    if (!isAuthenticated) return; // Prevent 401 unauthorized errors on console
     try {
       setLoading(true);
       setError("");
       const data = await fetchWishlist();
       setItems(data);
     } catch (err) {
+      if (err.response?.status === 401) {
+        logout(); // Transparently purge bad session, natively forcing unauthenticated UI rendering
+        return;
+      }
       const msg = err.response?.data?.message || "Failed to load wishlist.";
       setError(msg);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, logout]);
 
   useEffect(() => {
-    loadWishlist();
-  }, [loadWishlist]);
+    if (isAuthenticated) {
+      loadWishlist();
+    }
+  }, [loadWishlist, isAuthenticated]);
 
   const handleRemove = async (productId) => {
     try {
@@ -60,10 +69,21 @@ function Wishlist() {
 
       {!loading && !error && items.length === 0 && (
         <div className="wishlist-empty">
-          <p>Your wishlist is empty.</p>
-          <Link to="/" className="btn btn-amazon wishlist-empty-cta">
-            Continue shopping
-          </Link>
+          {!isAuthenticated ? (
+            <>
+              <p>Please log in to view and save items to your wishlist.</p>
+              <Link to="/login" className="btn btn-amazon wishlist-empty-cta">
+                Sign in to your account
+              </Link>
+            </>
+          ) : (
+            <>
+              <p>Your wishlist is empty.</p>
+              <Link to="/" className="btn btn-amazon wishlist-empty-cta">
+                Continue shopping
+              </Link>
+            </>
+          )}
         </div>
       )}
 

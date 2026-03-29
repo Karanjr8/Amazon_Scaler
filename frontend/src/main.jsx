@@ -9,6 +9,7 @@ import { LocationProvider } from "./context/LocationContext";
 import "./styles/layout-system.css";
 import "./styles/global.css";
 import "./styles/amazon-ui.css";
+import "./styles/Auth.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

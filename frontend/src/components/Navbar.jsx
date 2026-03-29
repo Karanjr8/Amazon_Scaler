@@ -19,7 +19,7 @@ const SUB_NAV_LINKS = [
   { label: "Electronics", to: { pathname: "/", search: "?category=Electronics" } },
 ];
 
-function Navbar() {
+function Navbar({ desktopSidebarCollapsed, setDesktopSidebarCollapsed }) {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
@@ -60,6 +60,23 @@ function Navbar() {
     navigate(`/${search}`);
   };
 
+  // Step 6: Prevent body scroll when menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [mobileMenuOpen]);
+
+  // Close menu on navigation
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [searchParams, user]);
+
   return (
     <>
       <header className="amz-header-container">
@@ -68,7 +85,13 @@ function Navbar() {
           <div className="amz-nav-left">
             <button 
               className="amz-hamburger-btn" 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  setMobileMenuOpen(!mobileMenuOpen);
+                } else {
+                  setDesktopSidebarCollapsed(!desktopSidebarCollapsed);
+                }
+              }}
               aria-label="Toggle navigation"
             >
               ☰
@@ -146,46 +169,105 @@ function Navbar() {
                </div>
             </div>
           </div>
-        </div>
-
-        {/* Secondary Ribbon / Mobile Nav Drawer */}
-        <div className={`amz-sub-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
-          <div 
-            className="amz-sub-item mobile-only" 
-            onClick={() => setLocationModalOpen(true)}
-            style={{ fontWeight: "bold" }}
-          >
-            📍 {location.city ? `Deliver to ${location.city}` : "Update location"}
           </div>
 
-          {/* Mobile Only: Authentication/User links moved here */}
-          {mobileMenuOpen && (
-            <>
-               {isAuthenticated ? (
-                 <div className="amz-sub-item mobile-only user-status" onClick={logout}>
-                   Hello, {user?.name || "User"} (Sign Out)
-                 </div>
-               ) : (
-                 <Link to="/login" className="amz-sub-item mobile-only user-status">
-                   Hello, sign in
+        {/* Secondary Horizontal Ribbon */}
+        <div className="amz-sub-nav">
+          {SUB_NAV_LINKS.map((link, i) => (
+            <Link 
+              key={i} 
+              to={link.to} 
+              className={`amz-sub-item ${link.bold ? 'amz-sub-item--bold' : ''}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Backdrop Overlay (Step 2) */}
+        {mobileMenuOpen && (
+          <div 
+            className="amz-sidebar-overlay" 
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Secondary Ribbon / Mobile Nav Drawer (Step 1/3) */}
+        <div className={`sidebar ${mobileMenuOpen || !desktopSidebarCollapsed ? "open" : ""}`}>
+          <div className="sidebar-header">
+             <div className="sidebar-user-block">
+                <span className="sidebar-user-icon">👤</span>
+                <span className="sidebar-user-greet">
+                  Hello, {isAuthenticated ? (user?.name || "User") : "sign in"}
+                </span>
+             </div>
+             {/* Close Button Inside Header */}
+             <button 
+               className="sidebar-close" 
+               onClick={() => {
+                 if (window.innerWidth <= 768) {
+                   setMobileMenuOpen(false);
+                 } else {
+                   setDesktopSidebarCollapsed(true);
+                 }
+               }}
+               aria-label="Close menu"
+             >
+               ✕
+             </button>
+          </div>
+
+          <div className="sidebar-body">
+            {/* Trend/Auth Section */}
+            <div className="sidebar-section">
+               {!isAuthenticated && (
+                 <Link to="/login" className="sidebar-item sidebar-item--highlight">
+                   Sign In
                  </Link>
                )}
-               <Link to="/orders" className="amz-sub-item mobile-only">Returns & Orders</Link>
-               <hr className="mobile-only" style={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-            </>
-          )}
+               <Link to="/orders" className="sidebar-item">Returns & Orders</Link>
+               <div 
+                 className="sidebar-item" 
+                 onClick={() => {
+                   setLocationModalOpen(true);
+                   setMobileMenuOpen(false);
+                 }}
+               >
+                 📍 {location.city ? `Deliver to ${location.city}` : "Update location"}
+               </div>
+            </div>
 
-          <div className="amz-sub-item">Fresh</div>
-          <div className="amz-sub-item">Amazon miniTV</div>
-          <Link to="/sell" className="amz-sub-item" style={{ color: "inherit", textDecoration: "none" }}>
-            Sell
-          </Link>
-          <div className="amz-sub-item">Best Sellers</div>
-          <div className="amz-sub-item">Mobiles</div>
-          <div className="amz-sub-item">Today's Deals</div>
-          <div className="amz-sub-item desktop-only">Customer Service</div>
-          <div className="amz-sub-item desktop-only">Prime ▼</div>
-          <div className="amz-sub-item desktop-only">Electronics</div>
+            {/* Trending Section */}
+            <div className="sidebar-section">
+               <h3>Trending</h3>
+               <Link to="/" className="sidebar-item">Best Sellers</Link>
+               <Link to={{ pathname: "/", search: "?q=deal" }} className="sidebar-item">Today's Deals</Link>
+               <Link to={{ pathname: "/", search: "?q=new" }} className="sidebar-item">New Releases</Link>
+            </div>
+
+            {/* Account Settings */}
+            <div className="sidebar-section">
+               <h3>Your Account</h3>
+               <Link to="/profile" className="sidebar-item">Your Profile</Link>
+               <Link to="/addresses" className="sidebar-item">Manage Address</Link>
+               <Link to="/payments" className="sidebar-item">Payment Options</Link>
+               <Link to="/orders" className="sidebar-item">Your Orders</Link>
+               <Link to="/messages" className="sidebar-item">Your Messages</Link>
+            </div>
+
+            {/* Settings */}
+            <div className="sidebar-section">
+               <h3>Help & Settings</h3>
+               <Link to="/wishlist" className="sidebar-item">Your Wishlist</Link>
+               <Link to="/" className="sidebar-item">Customer Service</Link>
+               {isAuthenticated && (
+                 <div className="sidebar-item" onClick={logout} style={{ color: '#c40000', fontWeight: 'bold' }}>
+                   Sign Out
+                 </div>
+               )}
+            </div>
+          </div>
         </div>
       </header>
 

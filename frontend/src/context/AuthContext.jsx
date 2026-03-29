@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { logoutUser } from "../api/authApi";
 
 const AuthContext = createContext(null);
 
@@ -6,35 +7,36 @@ const TOKEN_KEY = "authToken";
 const USER_KEY = "authUser";
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || "");
   const [user, setUser] = useState(() => {
     const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const token = localStorage.getItem(TOKEN_KEY);
+    return raw && token ? JSON.parse(raw) : null;
   });
 
-  const login = ({ token: nextToken, user: nextUser }) => {
-    localStorage.setItem(TOKEN_KEY, nextToken);
+  const login = ({ user: nextUser }) => {
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    setToken(nextToken);
     setUser(nextUser);
   };
 
-  const logout = () => {
-    localStorage.removeItem(TOKEN_KEY);
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
     localStorage.removeItem(USER_KEY);
-    setToken("");
+    localStorage.removeItem(TOKEN_KEY);
     setUser(null);
   };
 
   const value = useMemo(
     () => ({
-      token,
       user,
-      isAuthenticated: Boolean(token),
+      isAuthenticated: Boolean(user),
       login,
       logout,
     }),
-    [token, user]
+    [user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

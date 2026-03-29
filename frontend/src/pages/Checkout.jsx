@@ -45,6 +45,14 @@ function Checkout() {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!user) {
+      showToast("Please log in to proceed to checkout", "error");
+      navigate("/login?redirect=/checkout");
+    }
+  }, [user, navigate, showToast]);
   
   const [address, setAddress] = useState(() => {
     const saved = localStorage.getItem("amz_checkout_address");
@@ -118,7 +126,17 @@ function Checkout() {
       clearCart();
       navigate("/order-success", { state: { orderId: res.id } });
     } catch (err) {
-      showToast("Failed to place order. Try again.", "error");
+      console.error("[Checkout] Order Placement Failed:", err);
+      const msg = err.response?.data?.message || err.message || "Failed to place order. Try again.";
+      
+      // If unauthorized, redirect to login
+      if (err.response?.status === 401) {
+        showToast("Your session has expired. Please log in again.", "error");
+        navigate("/login?redirect=/checkout");
+        return;
+      }
+      
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }

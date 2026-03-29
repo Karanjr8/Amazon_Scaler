@@ -575,14 +575,19 @@
 }
 
 @media (max-width: 900px) {
+  .checkout-page {
+    padding: var(--space-2) var(--layout-gutter) calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .checkout-layout {
     grid-template-columns: 1fr;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .checkout-sidebar {
     position: static;
     order: 1;
+    width: 100%;
   }
 
   .checkout-main {
@@ -593,19 +598,39 @@
     grid-template-columns: 1fr;
   }
 
-  .checkout-page .form-group.full-width {
-    grid-column: span 1;
+  .checkout-header-bar {
+    padding: var(--space-2);
+    border-radius: 0;
+    margin: calc(-1 * var(--space-2)) calc(-1 * var(--layout-gutter)) var(--space-3);
   }
 
-  .address-confirm-btn {
-    grid-column: 1;
-    width: 100%;
-    justify-self: stretch;
-    text-align: center;
+  .checkout-header-bar h1 {
+    font-size: var(--text-lg);
   }
 
-  .pm-card-row {
-    grid-template-columns: 1fr;
+  .place-order-btn {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  /* Order History Stacking (Step 9) */
+  .order-card .order-header {
+    flex-direction: column;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .order-card .header-item {
+    text-align: left !important;
+  }
+
+  .order-card .order-body {
+    padding: 12px !important;
+  }
+
+  .order-items-list li {
+    flex-direction: column;
+    gap: 10px !important;
   }
 
   .checkout-mobile-bar {
@@ -655,9 +680,5 @@
     font-weight: 800;
     font-size: var(--text-sm);
     white-space: nowrap;
-  }
-
-  .checkout-page {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
 }

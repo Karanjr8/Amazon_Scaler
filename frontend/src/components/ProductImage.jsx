@@ -16,7 +16,7 @@ function ProductImage({
   cacheBustId,
   ...rest
 }) {
-  const raw = src ?? (product ? getProductPrimaryImage(product) : PRODUCT_IMAGE_PLACEHOLDER);
+  const raw = src ?? getProductPrimaryImage(product);
   const bustKey = cacheBustId ?? product?.id ?? null;
   const resolved =
     raw === PRODUCT_IMAGE_PLACEHOLDER ? raw : appendImageCacheBust(raw, bustKey);
