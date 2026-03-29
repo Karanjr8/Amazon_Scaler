@@ -12,7 +12,19 @@ const debugRoutes = require("./routes/debugRoutes");
 const app = express();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000"],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps or curl)
+    if (!origin) return callback(null, true);
+    const allowedPatterns = [
+      /^http:\/\/localhost:\d+$/,
+      /\.vercel\.app$/
+    ];
+    if (allowedPatterns.some(pattern => pattern.test(origin))) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
