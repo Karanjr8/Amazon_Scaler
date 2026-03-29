@@ -284,7 +284,7 @@ button.amz-sub-item {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 0;
+  z-index: 1;
   margin: 0;
   box-sizing: border-box;
   background: #eaeded;
@@ -2126,5 +2126,20 @@ button.amz-sub-item {
   }
   .amz-pdp-main-img {
     max-height: 360px;
+  }
+  .amz-pdp-purchase-box {
+    position: static;
+    margin-top: 15px;
+  }
+}
+
+/* Home page mobile layout: Tiles cover 40% of hero */
+@media (max-width: 767px) {
+  .amz-home-content {
+    margin-top: -60px !important;
+  }
+  
+  .amz-hero-container {
+    height: clamp(160px, 45vw, 240px);
   }
 }

@@ -122,7 +122,7 @@ function ProductList() {
       {!isBrowseMode && <HeroBanner />}
 
       {isBrowseMode ? (
-        <section className="page-section home-page-section home-page-section--browse container">
+        <section className={`page-section home-page-section home-page-section--browse container ${paramSearch ? 'search-page' : ''} ${selectedCategory ? 'category-page' : ''}`}>
           <header className="home-browse-header">
             <h1 className="page-title home-browse-title">
               Results for &quot;{paramSearch || selectedCategory}&quot;

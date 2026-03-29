@@ -124,15 +124,15 @@ function ProductCard({ product }) {
           <span className="product-price">{formatInr(getProductPrice(product))}</span>
         </div>
 
-        <div className="product-stock-row" style={{ marginTop: '4px', marginBottom: '8px', fontSize: '0.85rem' }}>
+        <div className="product-stock-row">
           {pStock > 0 ? (
             pStock < 5 ? (
-              <span style={{ color: '#b12704' }}>Only {pStock} left in stock - order soon.</span>
+              <span className="stock-low">Only {pStock} left in stock - order soon.</span>
             ) : (
-              <span style={{ color: '#007600' }}>In Stock</span>
+              <span className="stock-in">In Stock</span>
             )
           ) : (
-            <span style={{ color: '#b12704', fontWeight: 'bold' }}>Out of Stock</span>
+            <span className="stock-out">Out of Stock</span>
           )}
         </div>
 
