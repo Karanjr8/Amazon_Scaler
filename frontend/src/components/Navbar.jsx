@@ -98,6 +98,7 @@ function Navbar({ desktopSidebarCollapsed, setDesktopSidebarCollapsed }) {
             </button>
             <Link to="/" className="amz-nav-logo">
               amazon.in
+              <span className="amz-nav-logo-badge">Portfolio Demo</span>
             </Link>
           </div>
           

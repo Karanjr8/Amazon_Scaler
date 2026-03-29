@@ -200,6 +200,38 @@
   color: #555;
 }
 
+/* Disclaimer Banner */
+.auth-disclaimer {
+  background-color: #fcf8e3;
+  border: 1px solid #faebcc;
+  color: #8a6d3b;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  gap: 10px;
+}
+
+.auth-disclaimer-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.auth-logo-badge {
+  background: #f0c14b;
+  color: #111;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  vertical-align: top;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
 /* Responsiveness */
 @media (max-width: 400px) {
   .auth-card {

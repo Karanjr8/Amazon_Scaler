@@ -38,7 +38,16 @@ function Signup() {
             alt="Amazon Logo" 
             className="auth-logo-img"
           />
+          <span className="auth-logo-badge">PORTFOLIO DEMO</span>
         </Link>
+      </div>
+
+      <div className="auth-disclaimer">
+        <span className="auth-disclaimer-icon">⚠️</span>
+        <div>
+          <strong>PORTFOLIO DEMO ONLY:</strong> This is a UI clone created for a portfolio. 
+          It is <strong>NOT</strong> the real Amazon. For your safety, <strong>DO NOT</strong> use your actual Amazon password.
+        </div>
       </div>
 
       {error && (
